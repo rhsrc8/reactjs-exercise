@@ -191,44 +191,110 @@
             </div>
           )
       }
-      function App() {
-          const  [chatMessages, setChatMessages]=  React.useState( 
-              [{
-                    message:'hello chatbot',
-                    sender:'user',
-                    id:'id1',
-                  },{
-                      message:'Hello! How can I help you?',
-                      sender:'robot', 
-                      id:'id2',
-                  },{
-                      message:'can you get me todays date?',
-                      sender:'user', 
-                      id:'id3',
+      function LoginForm({ onLogin }) {
+      // 1. Şifre görünürlüğü için state
+      const [showPassword, setShowPassword] = React.useState(false);
 
-                  },{
-                      message:'Today is September 27',
-                      sender:'robot', 
-                      id: 'id4',
+      // 2. Inputlara yazılanları takip etmek için yeni state'ler (Bunu ekledik!)
+      const [email, setEmail] = React.useState('');
+      const [password, setPassword] = React.useState('');
 
-                  }]);
-          //const [chatMessages, setChatMessages]= array; chatli []var ya onların yerinde array vardı.Array destructuring        
-         // const chatMessages=array[0]; yukarıdaki kod bunların shortcutı
-         // const setChatMessages = array[1];
 
-        
-    
+      function loginControl() {
+      const testEmail = "test@mail.com";
+      const testPassword = "123";
+
+      if (email === testEmail && password === testPassword) {
+        onLogin(); // Eğer doğruysa App'teki setIsLoggedIn(true) çalışır
+      } else {
+        alert("Hatalı giriş! (İpucu: test@mail.com / 123)");
+      }
+    }
         return (
-          <div className= "app-container">
-            <ChatMessages
-            chatMessages={chatMessages}/>
-            <ChatInput chatMessages={chatMessages} 
-              setChatMessages={setChatMessages}
+          <div className="login-container-style"> {/* Genel bir kapsayıcı ekledik */}
+            <div className="login-form">
+              <input 
+                type="email"
+                placeholder="Email"
+                className="login-input"
+                value={email} // State'e bağladık
+                onChange={(e) => setEmail(e.target.value)} // Yazıldıkça state güncellenir
               />
+            </div>
+
+            <div className="password-container">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Password"
+                className="login-input"
+                value={password} // State'e bağladık
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              {/* Sadece şifreyi gösterip gizleyen küçük buton */}
+              <button 
+                type="button" 
+                onClick={() => setShowPassword(!showPassword)}
+                style={{ marginLeft: '-50px', cursor: 'pointer' }}
+              >
+                {showPassword ? 'Hide' : 'Show'}
+              </button>
+            </div>
+
+            <div style={{ marginTop: '20px' }}>
+              {/* Asıl giriş yapmamızı sağlayan buton */}
+              <button 
+                className="login-button" 
+                onClick={loginControl} // App fonksiyonundaki setIsLoggedIn(true)'yu çalıştırır
+              >
+                Login
+              </button>
+              
+              <button className="login-button">Sign up</button>
+            </div>
           </div>
         );
       }
+      
+     function App() {
+  // 1. Giriş durumunu takip eden yeni state
+  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
 
+  // 2. Senin mevcut mesaj state'in (Olduğu gibi bıraktık)
+  const [chatMessages, setChatMessages] = React.useState([
+    { message: 'hello chatbot', sender: 'user', id: 'id1' },
+    { message: 'Hello! How can I help you?', sender: 'robot', id: 'id2' },
+    { message: 'can you get me todays date?', sender: 'user', id: 'id3' },
+    { message: 'Today is September 27', sender: 'robot', id: 'id4' }
+  ]);
+
+  // 3. KOŞUL: Eğer giriş yapılmadıysa sadece Login formunu göster
+  if (!isLoggedIn) {
+    return (
+      <div className="login-container">
+        <LoginForm onLogin={() => setIsLoggedIn(true)} />
+      </div>
+    );
+  }
+
+  // 4. EĞER GİRİŞ YAPILDIYSA: mevcut Chatbot arayüzün çalışır
+  return (
+    <div className="app-container">
+      {/* Çıkış butonu eklemek istersen buraya koyabilirsin */}
+      <button 
+        onClick={() => setIsLoggedIn(false)} 
+        style={{alignSelf: 'flex-end', margin: '10px'}}
+      >
+        Logout
+      </button>
+
+      <ChatMessages chatMessages={chatMessages} />
+      <ChatInput 
+        chatMessages={chatMessages} 
+        setChatMessages={setChatMessages} 
+      />
+    </div>
+  );
+}
       const container = document.querySelector('.js-container');
       ReactDOM.createRoot(container).render(<App />);
     </script>
